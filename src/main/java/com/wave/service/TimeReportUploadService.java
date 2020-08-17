@@ -23,8 +23,8 @@ public class TimeReportUploadService {
     /**
      * @param file What This API Does:
      *             Uploads the Time-report to database.
-     *             It Checks if the time-report file was already uploaded
-     *             What This API Does not:
+     *             Checks if the time-report file was already uploaded
+     *             What This API Does NOT:
      *             Check if the Time-report data was uploaded for the same date before.
      * @throws ApplicationException
      * @throws ValidationException

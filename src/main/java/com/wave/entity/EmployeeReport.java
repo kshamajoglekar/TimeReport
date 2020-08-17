@@ -7,7 +7,7 @@ import java.time.LocalDate;
 import java.util.Optional;
 import java.util.Set;
 
-final class EmployeeReport {
+final class EmployeeReport implements Comparable<EmployeeReport> {
 
     @Getter
     private static Set<EmployeeReport> employeeReports = Set.of();
@@ -27,7 +27,6 @@ final class EmployeeReport {
         PayPeriod.initialize();
     }
 
-
     private static EmployeeReport create(String employeeId, PayPeriod payPeriod) {
         EmployeeReport employeeReport = new EmployeeReport();
         employeeReport.employeeId = employeeId;
@@ -39,11 +38,18 @@ final class EmployeeReport {
 
         final PayPeriod payPeriod = PayPeriod.of(date);
 
-        Optional<EmployeeReport> thisEmployeeReport = employeeReports.stream().filter(employeeReport -> (
-                employeeReport.employeeId.equalsIgnoreCase(employeeId)) && (employeeReport.payPeriod.equals(payPeriod))).findFirst();
-        EmployeeReport employeeReport = thisEmployeeReport.orElse(EmployeeReport.create(employeeId, payPeriod));
+        Optional<EmployeeReport> optionalEmployeeReport = employeeReports.stream()
+                .filter(employeeReport -> (employeeReport.employeeId.equalsIgnoreCase(employeeId))
+                        && (employeeReport.payPeriod.equals(payPeriod)))
+                .findFirst();
 
-        employeeReports = new ImmutableSet.Builder<EmployeeReport>().addAll(employeeReports).add(employeeReport).build();
+        EmployeeReport employeeReport = optionalEmployeeReport
+                .orElse(EmployeeReport.create(employeeId, payPeriod));
+
+        employeeReports = new ImmutableSet.Builder<EmployeeReport>()
+                .addAll(employeeReports)
+                .add(employeeReport)
+                .build();
 
         return employeeReport;
     }
@@ -65,6 +71,17 @@ final class EmployeeReport {
                     && this.payPeriod.equals(other.payPeriod);
         }
         return false;
+    }
+
+
+    @Override
+    public int compareTo(EmployeeReport other) {
+        if (this == other) return 0;
+        if (this.employeeId.compareTo(other.employeeId) != 0) {
+            return this.employeeId.compareTo(other.employeeId);
+        } else {
+            return this.payPeriod.compareTo(other.payPeriod);
+        }
     }
 
     @Override

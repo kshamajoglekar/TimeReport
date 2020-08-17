@@ -12,7 +12,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 
 /**
- * Time_Report_Archive table is NOT normalised.
+ * Time_Report_Archive is non-normalised table that holds all the data pushed from CSV file.Along with CSV file name.
  */
 @Entity
 @Table(name = "Time_Report_Archive")
@@ -20,8 +20,8 @@ import java.time.format.DateTimeParseException;
 public class TimeReport {
 
     @Id
-    @GenericGenerator(name="someId" , strategy="increment")
-    @GeneratedValue(generator="someId")
+    @GenericGenerator(name = "someId", strategy = "increment")
+    @GeneratedValue(generator = "someId")
     private Integer ID;
 
     @Column(name = "file_name", columnDefinition = "varchar")
@@ -44,7 +44,8 @@ public class TimeReport {
     @Setter
     @Getter
     private String jobGroup;
-    public TimeReport(String fileName,String fileLine) {
+
+    public TimeReport(String fileName, String fileLine) {
         String[] columns = fileLine.split(",");
         this.fileName = fileName;
         try {
@@ -52,9 +53,20 @@ public class TimeReport {
         } catch (DateTimeParseException e) {
             throw new ValidationException("Date can not be parsed " + columns[0]);
         }
-        hoursWorked = Double.valueOf(columns[1]);
+
+        try {
+            hoursWorked = Double.valueOf(columns[1]);
+        } catch (NumberFormatException e) {
+            throw new ValidationException("Hours worked not in correct format :" + columns[1]);
+        }
+
         employeeId = columns[2];
-        jobGroup = columns[3];
+
+        try {
+            jobGroup = JobGroup.valueOf(columns[3]).name();
+        } catch (IllegalArgumentException e) {
+            throw new ValidationException("Job Group Not Valid " + columns[3]);
+        }
     }
 
     @Override

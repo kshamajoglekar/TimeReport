@@ -26,12 +26,13 @@ public class PayrollReportController {
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public String getPayloadReport() throws ApplicationException {
-        mapper.registerModule(new JavaTimeModule());
-        mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
 
-        mapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
-        PayrollReport payrollReport=payrollReportService.getPayrollReport();
-        String payrollReportJson ="{}";
+        configureMapper();
+
+        final PayrollReport payrollReport=payrollReportService.getPayrollReport();
+
+        String payrollReportJson ="";
+
         try {
             payrollReportJson = mapper.writeValueAsString(payrollReport);
         } catch (JsonProcessingException e) {
@@ -40,6 +41,12 @@ public class PayrollReportController {
 
         System.out.println(payrollReport);
         return payrollReportJson;
+    }
+
+    private void configureMapper() {
+        mapper.registerModule(new JavaTimeModule());
+        mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+        mapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
     }
 
 }

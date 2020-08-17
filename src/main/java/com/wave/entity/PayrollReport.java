@@ -1,7 +1,9 @@
 package com.wave.entity;
 
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * This class is not persisted.
@@ -33,7 +35,7 @@ public class PayrollReport {
 
         });
 
-        return EmployeeReport.getEmployeeReports();
+        return EmployeeReport.getEmployeeReports().stream().sorted().collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
     @Override
