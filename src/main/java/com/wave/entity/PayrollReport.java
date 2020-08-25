@@ -16,26 +16,27 @@ public class PayrollReport {
 
     private PayrollReport() {}
 
+    private static PayrollReport payrollReport;
+    static {
+        payrollReport =new PayrollReport();
+    }
+
     public static PayrollReport get(List<TimeReport> timeReports) {
-        PayrollReport payrollReport = new PayrollReport();
         payrollReport.employeeReports = generateReport(timeReports);
         return payrollReport;
     }
 
     private static Set<EmployeeReport> generateReport(List<TimeReport> timeReports) {
 
-        EmployeeReport.initialize();  /* Workaround for the design issue. Static lists keep filling up. So creating a method to initialize them.
-                                      * Solution: EmployeeReport and PayPeriod classes to own a job of clearing themselves before every run. Use builders in the owner classes.
-                                      * */
+        EmployeeReportHolder employeeReportHolder=EmployeeReportHolder.get();
 
         timeReports.stream().forEach(timeReport ->
         {
-            EmployeeReport employeeReport = EmployeeReport.of(timeReport.getDate(), timeReport.getEmployeeId());
-            employeeReport.updateAmount(timeReport.getHoursWorked(), JobGroup.valueOf(timeReport.getJobGroup()));
-
+             employeeReportHolder.update(timeReport);
         });
 
-        return EmployeeReport.getEmployeeReports().stream().sorted().collect(Collectors.toCollection(LinkedHashSet::new));
+        return employeeReportHolder.getEmployeeReports().stream().sorted().collect(Collectors.toCollection(LinkedHashSet::new));
+
     }
 
     @Override

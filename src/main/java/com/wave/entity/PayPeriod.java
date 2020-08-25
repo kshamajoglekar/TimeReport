@@ -9,7 +9,7 @@ import java.util.Optional;
 import java.util.Set;
 
 final public class PayPeriod implements Comparable<PayPeriod> {
-    private static Set<PayPeriod> payPeriods = Set.of();
+
     @Getter
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private LocalDate startDate;
@@ -18,11 +18,28 @@ final public class PayPeriod implements Comparable<PayPeriod> {
     private LocalDate endDate;
 
 
-    private PayPeriod() {
-    }
 
-    static void initialize() {
-        payPeriods = Set.of();
+/*
+    payrollReport -> list of EmployeeReports;
+
+    EmployeeReport -> list of PayPeriods;
+
+
+
+*/
+
+
+
+
+
+
+
+
+
+
+
+
+    private PayPeriod() {
     }
 
     private static int getPayPeriodStartDate(final LocalDate date) {
@@ -33,31 +50,13 @@ final public class PayPeriod implements Comparable<PayPeriod> {
         return (date.getDayOfMonth() > 15) ? date.lengthOfMonth() : 15;
     }
 
-    private static PayPeriod create(final LocalDate date) {
+    public static PayPeriod create(final LocalDate date) {
         final PayPeriod payPeriod = new PayPeriod();
         payPeriod.startDate = LocalDate.of(date.getYear(), date.getMonth(), getPayPeriodStartDate(date));
         payPeriod.endDate = LocalDate.of(date.getYear(), date.getMonth(), getPayPeriodEndDate(date));
         return payPeriod;
     }
 
-    static PayPeriod of(final LocalDate date) {
-
-        Optional<PayPeriod> optionalPayPeriod = payPeriods.stream().filter(payPeriod -> {
-            if ((date.isEqual(payPeriod.startDate) || date.isAfter(payPeriod.startDate))
-                    && (date.isEqual(payPeriod.getEndDate()) || date.isBefore(payPeriod.getEndDate()))) {
-                return true;
-            }
-            return false;
-        }).findFirst();
-
-        PayPeriod payPeriod = optionalPayPeriod
-                .orElse(PayPeriod.create(date));
-
-        payPeriods = new ImmutableSet.Builder<PayPeriod>()
-                .addAll(payPeriods).add(payPeriod).build();
-
-        return payPeriod;
-    }
 
     @Override
     public int hashCode() {
