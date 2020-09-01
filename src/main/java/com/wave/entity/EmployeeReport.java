@@ -4,13 +4,16 @@ import com.google.common.collect.ImmutableSet;
 import lombok.Getter;
 
 import java.time.LocalDate;
-import java.util.Optional;
 import java.util.Set;
 
 final class EmployeeReport implements Comparable<EmployeeReport> {
 
     @Getter
     private static Set<EmployeeReport> employeeReports = Set.of();
+    //create map of employee report instead of Set. So that the reference to the object can be returned.
+    // map key = employee report and value is amount??
+
+
     @Getter
     private String employeeId;
     @Getter
@@ -36,20 +39,18 @@ final class EmployeeReport implements Comparable<EmployeeReport> {
 
     static EmployeeReport of(final LocalDate date, final String employeeId) {
 
+     //let the callie supply employee report map
         final PayPeriod payPeriod = PayPeriod.of(date);
 
-        Optional<EmployeeReport> optionalEmployeeReport = employeeReports.stream()
-                .filter(employeeReport -> (employeeReport.employeeId.equalsIgnoreCase(employeeId))
-                        && (employeeReport.payPeriod.equals(payPeriod)))
-                .findFirst();
+        EmployeeReport employeeReport = EmployeeReport.create(employeeId, payPeriod);
 
-        EmployeeReport employeeReport = optionalEmployeeReport
-                .orElse(EmployeeReport.create(employeeId, payPeriod));
 
-        employeeReports = new ImmutableSet.Builder<EmployeeReport>()
-                .addAll(employeeReports)
-                .add(employeeReport)
-                .build();
+        if (!employeeReports.contains(employeeReport)) {
+            employeeReports = new ImmutableSet.Builder<EmployeeReport>()
+                    .addAll(employeeReports)
+                    .add(employeeReport)
+                    .build();
+        }
 
         return employeeReport;
     }
@@ -60,7 +61,7 @@ final class EmployeeReport implements Comparable<EmployeeReport> {
 
     @Override
     public int hashCode() {
-        return super.hashCode();
+        return employeeId.hashCode();
     }
 
     @Override

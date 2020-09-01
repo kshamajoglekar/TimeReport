@@ -5,11 +5,15 @@ import com.google.common.collect.ImmutableSet;
 import lombok.Getter;
 
 import java.time.LocalDate;
-import java.util.Optional;
 import java.util.Set;
 
 final public class PayPeriod implements Comparable<PayPeriod> {
+
+    // remove this
     private static Set<PayPeriod> payPeriods = Set.of();
+
+    //create map of payperiod instead of Set. So that the reference to the object can be returned.
+    // map key = payperiod and valu
     @Getter
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private LocalDate startDate;
@@ -42,26 +46,22 @@ final public class PayPeriod implements Comparable<PayPeriod> {
 
     static PayPeriod of(final LocalDate date) {
 
-        Optional<PayPeriod> optionalPayPeriod = payPeriods.stream().filter(payPeriod -> {
-            if ((date.isEqual(payPeriod.startDate) || date.isAfter(payPeriod.startDate))
-                    && (date.isEqual(payPeriod.getEndDate()) || date.isBefore(payPeriod.getEndDate()))) {
-                return true;
-            }
-            return false;
-        }).findFirst();
+        //let the callie supply map of pay period map
+        PayPeriod payPeriod = PayPeriod.create(date);
 
-        PayPeriod payPeriod = optionalPayPeriod
-                .orElse(PayPeriod.create(date));
-
-        payPeriods = new ImmutableSet.Builder<PayPeriod>()
-                .addAll(payPeriods).add(payPeriod).build();
+        /*change here*/
+        if (!payPeriods.contains(payPeriod)) {
+            payPeriods = new ImmutableSet.Builder<PayPeriod>()
+                    .addAll(payPeriods).add(payPeriod).build();
+        }
 
         return payPeriod;
     }
 
     @Override
     public int hashCode() {
-        return super.hashCode();
+        /*change here*/
+        return startDate.hashCode()+endDate.hashCode();
     }
 
     @Override
